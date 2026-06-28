@@ -7,6 +7,8 @@ import dao.SiswaDAO;
 import model.Siswa;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class MainFrame extends JFrame {
 
@@ -43,6 +45,25 @@ public class MainFrame extends JFrame {
     btnSimpan.addActionListener(e -> simpanData());
     btnEdit.addActionListener(e -> editData());
     btnHapus.addActionListener(e -> hapusData());
+    btnClear.addActionListener(e -> clearForm());
+    
+    txtCari.getDocument().addDocumentListener(new DocumentListener() {
+
+    public void insertUpdate(DocumentEvent e) {
+        cariData();
+    }
+
+    public void removeUpdate(DocumentEvent e) {
+        cariData();
+    }
+
+    public void changedUpdate(DocumentEvent e) {
+        cariData();
+    }
+
+});
+    
+
 
     table.getSelectionModel().addListSelectionListener(e -> {
         if (!e.getValueIsAdjusting()) {
@@ -52,6 +73,8 @@ public class MainFrame extends JFrame {
 
     setVisible(true);
 }
+
+
     
 private void editData() {
 
@@ -78,11 +101,35 @@ private void editData() {
 
         clearForm();
         loadTable();
+        
+        
 
     } else {
 
         JOptionPane.showMessageDialog(this,
                 "Data gagal diubah.");
+
+    }
+
+}
+
+private void cariData() {
+
+    model.setRowCount(0);
+
+    SiswaDAO dao = new SiswaDAO();
+
+    List<Siswa> list = dao.cari(txtCari.getText());
+
+    for (Siswa s : list) {
+
+        model.addRow(new Object[]{
+            s.getNis(),
+            s.getNama(),
+            s.getKelas(),
+            s.getBulan(),
+            s.getStatus()
+        });
 
     }
 
@@ -139,6 +186,8 @@ private void isiForm() {
 
     cmbBulan.setSelectedItem(model.getValueAt(row, 3).toString());
     cmbStatus.setSelectedItem(model.getValueAt(row, 4).toString());
+
+    txtNis.setEditable(false);
 }
     private void initComponents(){
 
@@ -256,6 +305,7 @@ leftPanel.add(btnClear,c);
         );
 
         txtCari = new JTextField();
+        txtCari.setToolTipText("Cari berdasarkan NIS, Nama, Kelas, Bulan, atau Status");
 
         rightPanel.add(txtCari,BorderLayout.NORTH);
 
@@ -329,8 +379,13 @@ private void clearForm() {
     cmbBulan.setSelectedIndex(0);
     cmbStatus.setSelectedIndex(0);
 
-    txtNis.requestFocus();
+    txtCari.setText("");
 
+    txtNis.setEditable(true);
+
+    loadTable();
+
+    txtNis.requestFocus();
 }
 
 private void loadTable() {
