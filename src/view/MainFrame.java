@@ -41,10 +41,105 @@ public class MainFrame extends JFrame {
     loadTable();
 
     btnSimpan.addActionListener(e -> simpanData());
+    btnEdit.addActionListener(e -> editData());
+    btnHapus.addActionListener(e -> hapusData());
+
+    table.getSelectionModel().addListSelectionListener(e -> {
+        if (!e.getValueIsAdjusting()) {
+            isiForm();
+        }
+    });
 
     setVisible(true);
 }
+    
+private void editData() {
 
+    if (txtNis.getText().trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+                "Pilih data yang akan diedit!");
+        return;
+    }
+
+    Siswa siswa = new Siswa();
+
+    siswa.setNis(txtNis.getText().trim());
+    siswa.setNama(txtNama.getText().trim());
+    siswa.setKelas(txtKelas.getText().trim());
+    siswa.setBulan(cmbBulan.getSelectedItem().toString());
+    siswa.setStatus(cmbStatus.getSelectedItem().toString());
+
+    SiswaDAO dao = new SiswaDAO();
+
+    if (dao.update(siswa)) {
+
+        JOptionPane.showMessageDialog(this,
+                "Data berhasil diubah.");
+
+        clearForm();
+        loadTable();
+
+    } else {
+
+        JOptionPane.showMessageDialog(this,
+                "Data gagal diubah.");
+
+    }
+
+}
+
+private void hapusData() {
+
+    if (txtNis.getText().trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+                "Pilih data yang akan dihapus!");
+        return;
+    }
+
+    int pilih = JOptionPane.showConfirmDialog(
+            this,
+            "Yakin ingin menghapus data ini?",
+            "Konfirmasi",
+            JOptionPane.YES_NO_OPTION);
+
+    if (pilih == JOptionPane.YES_OPTION) {
+
+        SiswaDAO dao = new SiswaDAO();
+
+        if (dao.hapus(txtNis.getText().trim())) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Data berhasil dihapus.");
+
+            clearForm();
+            loadTable();
+
+        } else {
+
+            JOptionPane.showMessageDialog(this,
+                    "Data gagal dihapus.");
+
+        }
+
+    }
+
+}
+
+private void isiForm() {
+
+    int row = table.getSelectedRow();
+
+    if (row == -1) {
+        return;
+    }
+
+    txtNis.setText(model.getValueAt(row, 0).toString());
+    txtNama.setText(model.getValueAt(row, 1).toString());
+    txtKelas.setText(model.getValueAt(row, 2).toString());
+
+    cmbBulan.setSelectedItem(model.getValueAt(row, 3).toString());
+    cmbStatus.setSelectedItem(model.getValueAt(row, 4).toString());
+}
     private void initComponents(){
 
         setLayout(new BorderLayout(10,10));

@@ -41,27 +41,26 @@ public class SiswaDAO {
     // ==========================
     public boolean update(Siswa siswa) {
 
-        String sql = "UPDATE spp SET nama=?, kelas=?, bulan=?, status=? WHERE nis=?";
+    String sql = "UPDATE spp SET nama=?, kelas=?, bulan=?, status=? WHERE nis=?";
 
-        try (Connection conn = DBHelper.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    try (Connection conn = DBHelper.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, siswa.getNama());
-            ps.setString(2, siswa.getKelas());
-            ps.setString(3, siswa.getBulan());
-            ps.setString(4, siswa.getStatus());
-            ps.setString(5, siswa.getNis());
+        ps.setString(1, siswa.getNama());
+        ps.setString(2, siswa.getKelas());
+        ps.setString(3, siswa.getBulan());
+        ps.setString(4, siswa.getStatus());
+        ps.setString(5, siswa.getNis());
 
-            ps.executeUpdate();
+        ps.executeUpdate();
 
-            return true;
+        return true;
 
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-
+    } catch (SQLException e) {
+        System.out.println(e.getMessage());
+        return false;
     }
+}
 
     // ==========================
     // HAPUS
