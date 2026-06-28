@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.io.*;
 
 public class MainFrame extends JFrame {
 
@@ -24,6 +25,7 @@ public class MainFrame extends JFrame {
     private JButton btnEdit;
     private JButton btnHapus;
     private JButton btnClear;
+    private JButton btnExport;
 
     // ========= TABLE =========
     private JTable table;
@@ -46,6 +48,7 @@ public class MainFrame extends JFrame {
     btnEdit.addActionListener(e -> editData());
     btnHapus.addActionListener(e -> hapusData());
     btnClear.addActionListener(e -> clearForm());
+    btnExport.addActionListener(e -> exportCSV());
     
     txtCari.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -60,8 +63,13 @@ public class MainFrame extends JFrame {
     public void changedUpdate(DocumentEvent e) {
         cariData();
     }
+    
 
 });
+    
+
+    
+
     
 
 
@@ -74,7 +82,64 @@ public class MainFrame extends JFrame {
     setVisible(true);
 }
 
+private void exportCSV() {
 
+    JFileChooser chooser = new JFileChooser();
+    chooser.setDialogTitle("Simpan File CSV");
+
+    if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+
+        File file = chooser.getSelectedFile();
+
+        if (!file.getName().endsWith(".csv")) {
+            file = new File(file.getAbsolutePath() + ".csv");
+        }
+
+        try (PrintWriter pw = new PrintWriter(file)) {
+
+            // Header
+            for (int i = 0; i < table.getColumnCount(); i++) {
+
+                pw.print(table.getColumnName(i));
+
+                if (i < table.getColumnCount() - 1)
+                    pw.print(",");
+
+            }
+
+            pw.println();
+
+            // Isi tabel
+            for (int i = 0; i < table.getRowCount(); i++) {
+
+                for (int j = 0; j < table.getColumnCount(); j++) {
+
+                    Object value = table.getValueAt(i, j);
+
+                    pw.print(value == null ? "" : value.toString());
+
+                    if (j < table.getColumnCount() - 1)
+                        pw.print(",");
+
+                }
+
+                pw.println();
+
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Export CSV berhasil!");
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Export gagal!\n" + ex.getMessage());
+
+        }
+
+    }
+
+}
     
 private void editData() {
 
@@ -236,6 +301,7 @@ cmbStatus.addItem("Belum Lunas");
         btnEdit = new JButton("Edit");
         btnHapus = new JButton("Hapus");
         btnClear = new JButton("Clear");
+        btnExport = new JButton("Export CSV");
 
         // NIS
         c.gridx=0;
@@ -293,6 +359,9 @@ leftPanel.add(btnHapus,c);
 
 c.gridy++;
 leftPanel.add(btnClear,c);
+
+c.gridy++;
+leftPanel.add(btnExport,c);
 
         //============================
         // PANEL KANAN
@@ -406,7 +475,10 @@ private void loadTable() {
     s.getStatus()
 });
 
+
+
     }
 
 }
+
 }
