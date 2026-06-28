@@ -26,6 +26,7 @@ public class MainFrame extends JFrame {
     private JButton btnHapus;
     private JButton btnClear;
     private JButton btnExport;
+    private JButton btnImport;
 
     // ========= TABLE =========
     private JTable table;
@@ -49,6 +50,7 @@ public class MainFrame extends JFrame {
     btnHapus.addActionListener(e -> hapusData());
     btnClear.addActionListener(e -> clearForm());
     btnExport.addActionListener(e -> exportCSV());
+    btnImport.addActionListener(e -> importCSV());
     
     txtCari.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -140,7 +142,60 @@ private void exportCSV() {
     }
 
 }
-    
+
+private void importCSV() {
+
+    JFileChooser chooser = new JFileChooser();
+
+    if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+
+        File file = chooser.getSelectedFile();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+
+            SiswaDAO dao = new SiswaDAO();
+
+            String line;
+
+            // Lewati header
+            br.readLine();
+
+            while ((line = br.readLine()) != null) {
+
+                String[] data = line.split(",");
+
+                if (data.length >= 5) {
+
+                    Siswa siswa = new Siswa();
+
+                    siswa.setNis(data[0]);
+                    siswa.setNama(data[1]);
+                    siswa.setKelas(data[2]);
+                    siswa.setBulan(data[3]);
+                    siswa.setStatus(data[4]);
+
+                    dao.simpan(siswa);
+
+                }
+
+            }
+
+            loadTable();
+
+            JOptionPane.showMessageDialog(this,
+                    "Import CSV berhasil!");
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Import gagal!\n" + ex.getMessage());
+
+        }
+
+    }
+
+}
+
 private void editData() {
 
     if (txtNis.getText().trim().isEmpty()) {
@@ -302,6 +357,7 @@ cmbStatus.addItem("Belum Lunas");
         btnHapus = new JButton("Hapus");
         btnClear = new JButton("Clear");
         btnExport = new JButton("Export CSV");
+        btnImport = new JButton("Import CSV");
 
         // NIS
         c.gridx=0;
@@ -362,6 +418,9 @@ leftPanel.add(btnClear,c);
 
 c.gridy++;
 leftPanel.add(btnExport,c);
+
+c.gridy++;
+leftPanel.add(btnImport,c);
 
         //============================
         // PANEL KANAN
