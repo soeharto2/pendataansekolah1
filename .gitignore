@@ -1,0 +1,12 @@
+# Folder build
+build/
+dist/
+
+# File hasil compile Java
+*.class
+
+# Konfigurasi lokal NetBeans
+nbproject/private/
+
+# Log
+*.log
